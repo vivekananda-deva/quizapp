@@ -1,27 +1,4 @@
 services:
-  # MySQL 8 private service. It is reachable only by other Render services
-  # in the same private network.
-  - type: pserv
-    name: quizapp-mysql
-    runtime: docker
-    plan: free
-    repo: https://github.com/render-examples/mysql.git
-    branch: master
-    envVars:
-      - key: MYSQL_DATABASE
-        value: quizapp
-      - key: MYSQL_USER
-        value: quizapp
-      - key: MYSQL_PASSWORD
-        generateValue: true
-      - key: MYSQL_ROOT_PASSWORD
-        generateValue: true
-    disk:
-      name: mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 10
-
-  # Java/Jetty web application.
   - type: web
     name: quizapp
     runtime: docker
@@ -30,14 +7,10 @@ services:
     healthCheckPath: /
     envVars:
       - key: JDBC_URL
-        value: jdbc:mysql://quizapp-mysql:3306/quizapp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+        sync: false
+
       - key: DB_USER
-        fromService:
-          name: quizapp-mysql
-          type: pserv
-          envVarKey: MYSQL_USER
+        sync: false
+
       - key: DB_PASSWORD
-        fromService:
-          name: quizapp-mysql
-          type: pserv
-          envVarKey: MYSQL_PASSWORD
+        sync: false
